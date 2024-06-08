@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mo's Diary service'</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #loginContainer {
+            text-align: center;
+        }
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            margin-bottom: 20px;
+        }
+        #loginForm input {
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #loginForm button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        #aboutButton {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #aboutSection {
+            display: none;
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        #diaryEntry {
+            display: none;
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .entry {
+            margin-bottom: 20px;
+        }
+        .entry h2, .entry h3, .entry p {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginContainer">
+        <h1>Mo's Diary hosting</h1>
+        <div id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button onclick="validateLogin()">Login</button>
+            <button id="aboutButton" onclick="showAbout()">About</button>
+        </div>
+    </div>
+
+    <div id="aboutSection">
+        <h2>About This Software</h2>
+        <p>Welcome to Mo's diary hosting! A simple and secure application to host even your deepest secrets! We guarantee 100% data security. Curious about anything specific? Just contact me: morischi@gmx.de</p>
+        <button onclick="hideAbout()">Close</button>
+    </div>
+
+    <div id="diaryEntry">
+        <div class="entry">
+            <h2 id="entryDate"></h2>
+            <h3 id="entryTitle"></h3>
+            <p id="entryContent"></p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        // Hashed values of the username and password
+        const correctUsernameHash = '6dda8e5f772b9b076ec11651e7b0c142';
+        const correctPasswordHash = '542658a4bf8a7804d631b5600972b894';
+
+        const encryptedDiaryEntry = 'U2FsdGVkX184JZE45ciooYD7yP3vAZMXfZVqm2F1i7Pp9HP4lv1aCPuNqs4ZucXxW0QTMX8DP5dzoy8+XchIXKVKtXO6qLvqeSXtJ2V/w6PBapJaR7RDOtsrE6LMQc8LEH72e6u0EUVqiDFGs3z75ncbnciH5vr7OF1ejjL8xVJoefjcXcrNsnJZyh1mBlV+PZxj/VnyCAj+I2zGevfdgnmZdDNU3AZDFcIbS7dwZWgaMjc5gC9gZwINrW862/N6s2xquj3J9fhoZkUq5dkhYMCL+qth+7Z0bpV6F88VSh0fMryIGG3a92QjvmhibuFyHB5iGOu+IfaON0WHT5dfXWGVnFRHfJAvVa/byakmW8A0ZR14FbjCzxCLtX+4AbrJd9h2uvrq2RLPW4QWgCzeVeuQmZyyAUCEs5lRgOqzOekFZDV8xb/5EnjSSUjg9MNTx0ywycdMmP19nPuR9EsEBHGnzp1FsyN48Ubhw2mjOgOjbz0uSYaCQGjbQlOr7sTF/gMqBCll7mL0bFiUx6o7MWqVR91EzrJrLT2nX73RLVhojoizY7sGrwgTOo8WMYcIDU7VVf/Lf5PONpTr1CDEm+23dP5ohdZ9GnMu36OHM+C53hdqg7mY8w6hAdW0xojeOP9+4XuYf4M6RuhI6DJti/Nal8TZPVMMpe9RLqvdQRmllLftKxf5Y9dl2Zoezc7Fo0Rd+NTYhK1zkcbmYm3/Y4BpnvYznZykike+LE90kX5vGOkwZH0eA2A47QK3L8uqoI3iBOWupnIDVhOgG4ItwKaYPN4naR4CMyWgP+fF4EP0F3Ya1lnOZeLlY/lhfjZ2KOsyMwhDOKmj43oxMMLUYS1KDI6tOoPCGAf67CzrKc8=';
+
+        function md5(string) {
+            return CryptoJS.MD5(string).toString();
+        }
+
+        function validateLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const usernameHash = md5(username);
+            const passwordHash = md5(password);
+
+            if (usernameHash === correctUsernameHash && passwordHash === correctPasswordHash) {
+                decryptAndShowDiary(password);
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('diaryEntry').style.display = 'block';
+            } else {
+                alert('Invalid username or password. Please try again.');
+            }
+        }
+
+        function decryptAndShowDiary(password) {
+            try {
+                const decryptedData = CryptoJS.AES.decrypt(encryptedDiaryEntry, password).toString(CryptoJS.enc.Utf8);
+                const entry = JSON.parse(decryptedData);
+
+                document.getElementById('entryDate').textContent = entry.date;
+                document.getElementById('entryTitle').textContent = entry.title;
+                document.getElementById('entryContent').textContent = entry.content;
+            } catch (error) {
+                alert('Decryption failed. Please ensure you have entered the correct password.');
+            }
+        }
+
+        function showAbout() {
+            document.getElementById('aboutSection').style.display = 'block';
+        }
+
+        function hideAbout() {
+            document.getElementById('aboutSection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
